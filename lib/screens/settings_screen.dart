@@ -10,11 +10,7 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
   bool _vibrationEnabled = true;
-  bool _soundEnabled = false;
-  String _selectedLanguage = 'O\'zbek';
-  String _selectedTheme = 'Teal';
 
   @override
   void initState() {
@@ -25,21 +21,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _loadSettings() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      _notificationsEnabled = prefs.getBool('notifications_enabled') ?? true;
       _vibrationEnabled = prefs.getBool('vibration_enabled') ?? true;
-      _soundEnabled = prefs.getBool('sound_enabled') ?? false;
-      _selectedLanguage = prefs.getString('selected_language') ?? 'O\'zbek';
-      _selectedTheme = prefs.getString('selected_theme') ?? 'Teal';
     });
   }
 
   Future<void> _saveSettings() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('notifications_enabled', _notificationsEnabled);
     await prefs.setBool('vibration_enabled', _vibrationEnabled);
-    await prefs.setBool('sound_enabled', _soundEnabled);
-    await prefs.setString('selected_language', _selectedLanguage);
-    await prefs.setString('selected_theme', _selectedTheme);
   }
 
   @override
@@ -61,22 +49,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
         child: ListView(
           padding: EdgeInsets.all(16),
           children: [
-            // Bildirishnomalar bo'limi
+            // Vibratsiya bo'limi
             _buildSectionCard(
-              title: 'Bildirishnomalar',
-              icon: Icons.notifications,
+              title: 'Vibratsiya',
+              icon: Icons.vibration,
               children: [
-                _buildSwitchTile(
-                  title: 'Namoz vaqti bildirishnomalari',
-                  subtitle: 'Namoz vaqtida eslatma',
-                  value: _notificationsEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _notificationsEnabled = value;
-                    });
-                    _saveSettings();
-                  },
-                ),
                 _buildSwitchTile(
                   title: 'Vibratsiya',
                   subtitle: 'Tasbeh va bildirishnomalarda',
@@ -87,61 +64,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     });
                     _saveSettings();
                   },
-                ),
-                _buildSwitchTile(
-                  title: 'Ovoz',
-                  subtitle: 'Bildirishnoma ovozlari',
-                  value: _soundEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _soundEnabled = value;
-                    });
-                    _saveSettings();
-                  },
-                ),
-              ],
-            ),
-
-            SizedBox(height: 16),
-
-            // Til va mavzu bo'limi
-            _buildSectionCard(
-              title: 'Til va Mavzu',
-              icon: Icons.language,
-              children: [
-                _buildListTile(
-                  title: 'Til',
-                  subtitle: _selectedLanguage,
-                  icon: Icons.translate,
-                  onTap: () => _showLanguageDialog(),
-                ),
-                _buildListTile(
-                  title: 'Mavzu',
-                  subtitle: _selectedTheme,
-                  icon: Icons.palette,
-                  onTap: () => _showThemeDialog(),
-                ),
-              ],
-            ),
-
-            SizedBox(height: 16),
-
-            // Ma'lumotlar bo'limi
-            _buildSectionCard(
-              title: 'Ma\'lumotlar',
-              icon: Icons.storage,
-              children: [
-                _buildListTile(
-                  title: 'Cache tozalash',
-                  subtitle: 'Saqlangan ma\'lumotlarni tozalash',
-                  icon: Icons.delete_sweep,
-                  onTap: () => _showClearCacheDialog(),
-                ),
-                _buildListTile(
-                  title: 'Ma\'lumotlarni qayta yuklash',
-                  subtitle: 'Namoz vaqtlarini yangilash',
-                  icon: Icons.refresh,
-                  onTap: () => _refreshData(),
                 ),
               ],
             ),
@@ -259,129 +181,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
       trailing: onTap != null ? Icon(Icons.arrow_forward_ios, size: 16) : null,
       onTap: onTap,
     );
-  }
-
-  void _showLanguageDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Til tanlash'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: Text('O\'zbek'),
-              value: 'O\'zbek',
-              groupValue: _selectedLanguage,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
-                _saveSettings();
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<String>(
-              title: Text('English'),
-              value: 'English',
-              groupValue: _selectedLanguage,
-              onChanged: (value) {
-                setState(() {
-                  _selectedLanguage = value!;
-                });
-                _saveSettings();
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showThemeDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Mavzu tanlash'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioListTile<String>(
-              title: Text('Teal'),
-              value: 'Teal',
-              groupValue: _selectedTheme,
-              onChanged: (value) {
-                setState(() {
-                  _selectedTheme = value!;
-                });
-                _saveSettings();
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<String>(
-              title: Text('Blue'),
-              value: 'Blue',
-              groupValue: _selectedTheme,
-              onChanged: (value) {
-                setState(() {
-                  _selectedTheme = value!;
-                });
-                _saveSettings();
-                Navigator.pop(context);
-              },
-            ),
-            RadioListTile<String>(
-              title: Text('Green'),
-              value: 'Green',
-              groupValue: _selectedTheme,
-              onChanged: (value) {
-                setState(() {
-                  _selectedTheme = value!;
-                });
-                _saveSettings();
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showClearCacheDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Cache tozalash'),
-        content: Text(
-          'Barcha saqlangan ma\'lumotlarni o\'chirishni xohlaysizmi?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Bekor qilish'),
-          ),
-          TextButton(
-            onPressed: () async {
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.clear();
-              Navigator.pop(context);
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text('Cache tozalandi')));
-            },
-            child: Text('Tozalash', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _refreshData() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('Ma\'lumotlar yangilandi')));
   }
 
   void _showContactDialog() {

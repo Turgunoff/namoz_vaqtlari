@@ -4,7 +4,6 @@
 import 'package:flutter/material.dart';
 import 'main_screen.dart';
 import 'tasbeh_screen.dart';
-import 'qibla_screen.dart';
 import 'settings_screen.dart';
 
 class MainNavigation extends StatefulWidget {
@@ -18,7 +17,6 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     MainScreen(),
     TasbehScreen(),
-    QiblaScreen(),
     SettingsScreen(),
   ];
 
@@ -61,7 +59,6 @@ class _MainNavigationState extends State<MainNavigation> {
               icon: Icon(Icons.fiber_smart_record),
               label: 'Tasbeh',
             ),
-            BottomNavigationBarItem(icon: Icon(Icons.explore), label: 'Qibla'),
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Sozlamalar',
