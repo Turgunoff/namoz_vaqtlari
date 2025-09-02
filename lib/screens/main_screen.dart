@@ -7,7 +7,6 @@ import '../models/prayer_models.dart';
 import '../services/prayer_time_service.dart';
 import '../widgets/prayer_time_card.dart';
 import '../widgets/city_selector.dart';
-import 'tasbeh_screen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -72,11 +71,16 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   List<PrayerTime> getPrayerTimesList() {
+    final now = DateTime.now();
+    final currentMinutes = now.hour * 60 + now.minute;
+    String? nextPrayerName = _getNextPrayerTime(currentMinutes);
+
     return prayerTimes.entries.map((entry) {
       return PrayerTime(
         name: entry.key,
         time: entry.value,
         isActive: _isActiveTime(entry.value),
+        isNextTime: entry.key == nextPrayerName,
       );
     }).toList();
   }
@@ -93,6 +97,33 @@ class _MainScreenState extends State<MainScreen> {
     } catch (e) {
       return false;
     }
+  }
+
+  String? _getNextPrayerTime(int currentMinutes) {
+    if (currentDate.day != DateTime.now().day) return null;
+
+    // Namoz vaqtlari tartibini belgilash
+    final prayerOrder = ['Bomdod', 'Quyosh', 'Peshin', 'Asr', 'Shom', 'Xufton'];
+
+    // Hozirgi vaqtdan keyingi namoz vaqtini topish
+    for (String prayerName in prayerOrder) {
+      if (prayerTimes.containsKey(prayerName)) {
+        try {
+          final parts = prayerTimes[prayerName]!.split(':');
+          final prayerMinutes = int.parse(parts[0]) * 60 + int.parse(parts[1]);
+
+          // Agar namoz vaqti hozirgi vaqtdan keyin bo'lsa
+          if (prayerMinutes > currentMinutes) {
+            return prayerName;
+          }
+        } catch (e) {
+          continue;
+        }
+      }
+    }
+
+    // Agar bugun barcha namoz vaqtlari o'tib ketgan bo'lsa, ertangi Bomdod
+    return 'Bomdod';
   }
 
   String getFormattedDate() {

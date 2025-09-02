@@ -5,8 +5,14 @@ class PrayerTime {
   final String name;
   final String time;
   final bool isActive;
+  final bool isNextTime;
 
-  PrayerTime({required this.name, required this.time, this.isActive = false});
+  PrayerTime({
+    required this.name,
+    required this.time,
+    this.isActive = false,
+    this.isNextTime = false,
+  });
 }
 
 class City {

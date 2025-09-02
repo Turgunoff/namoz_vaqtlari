@@ -198,7 +198,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             SizedBox(height: 8),
             Text('Telegram: @afsonamakon'),
             SizedBox(height: 8),
-            Text('Telefon: +998 90 123 45 67'),
+            Text('Telefon: +998 33 593 12 24'),
           ],
         ),
         actions: [
