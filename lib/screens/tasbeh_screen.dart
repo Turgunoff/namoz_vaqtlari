@@ -1,5 +1,5 @@
-// screens/tasbeh_screen.dart - Tasbeh ekrani
-// Copyright (c) 2025 Afsona Makon MCHJ. All rights reserved.
+// screens/tasbeh_screen.dart - VIBRATSIYA TUZATILGAN
+// Asosiy o'zgarish: vibratsiya sozlamasini har safar tekshirish
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -20,8 +20,8 @@ class _TasbehScreenState extends State<TasbehScreen> {
     'Istighfar': 0,
   };
   bool isLoading = true;
+  bool vibrationEnabled = true; // YANGI: vibratsiya sozlamasi
 
-  // Zikr turlari
   final List<String> dhikrTypes = [
     'SubhanAlloh',
     'Alhamdulillah',
@@ -42,8 +42,8 @@ class _TasbehScreenState extends State<TasbehScreen> {
     setState(() {
       counter = prefs.getInt('tasbehCounter') ?? 0;
       selectedDhikr = prefs.getString('selectedDhikr') ?? 'SubhanAlloh';
+      vibrationEnabled = prefs.getBool('vibration_enabled') ?? true; // YANGI
 
-      // Har bir zikr uchun alohida sanagichlarni yuklash
       for (String dhikr in dhikrTypes) {
         dhikrCounters[dhikr] = prefs.getInt('dhikr_$dhikr') ?? 0;
       }
@@ -52,35 +52,53 @@ class _TasbehScreenState extends State<TasbehScreen> {
     });
   }
 
+  // YANGI: Vibratsiya sozlamasini qayta yuklash
+  Future<void> _checkVibrationSetting() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      vibrationEnabled = prefs.getBool('vibration_enabled') ?? true;
+    });
+  }
+
   Future<void> _saveCounters() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('tasbehCounter', counter);
     await prefs.setString('selectedDhikr', selectedDhikr);
 
-    // Har bir zikr uchun alohida sanagichlarni saqlash
     for (String dhikr in dhikrTypes) {
       await prefs.setInt('dhikr_$dhikr', dhikrCounters[dhikr]!);
     }
   }
 
   void _incrementCounter() async {
+    // YANGI: Har safar vibratsiya sozlamasini tekshirish
+    await _checkVibrationSetting();
+
     setState(() {
       counter++;
       dhikrCounters[selectedDhikr] = dhikrCounters[selectedDhikr]! + 1;
 
-      if (counter == 33) {
-        counter = 0;
-        // Kuchli vibratsiya - 3 marta
-        HapticFeedback.heavyImpact();
-        Future.delayed(Duration(milliseconds: 100), () {
+      // Vibratsiya faqat yoqilgan bo'lsa ishlaydi
+      if (vibrationEnabled) {
+        if (counter == 33) {
+          counter = 0;
+          // Kuchli vibratsiya - 3 marta
           HapticFeedback.heavyImpact();
-        });
-        Future.delayed(Duration(milliseconds: 200), () {
-          HapticFeedback.heavyImpact();
-        });
-      } else if (counter % 11 == 0) {
-        // Har 11 ta zikrda engil vibratsiya
-        HapticFeedback.lightImpact();
+          Future.delayed(Duration(milliseconds: 100), () {
+            HapticFeedback.heavyImpact();
+          });
+          Future.delayed(Duration(milliseconds: 200), () {
+            HapticFeedback.heavyImpact();
+          });
+        } else {
+          // Har bosganda engil feedback
+          HapticFeedback.selectionClick();
+        }
+      } else {
+        // Vibratsiya o'chirilgan bo'lsa ham counter reset
+        if (counter == 33) {
+          counter = 0;
+        }
       }
     });
 
@@ -88,8 +106,13 @@ class _TasbehScreenState extends State<TasbehScreen> {
   }
 
   void _resetCounter() async {
-    // Vibratsiya feedback
-    HapticFeedback.mediumImpact();
+    // YANGI: Reset bosganda ham sozlamani tekshirish
+    await _checkVibrationSetting();
+
+    if (vibrationEnabled) {
+      HapticFeedback.mediumImpact();
+    }
+
     setState(() {
       counter = 0;
     });
@@ -109,10 +132,13 @@ class _TasbehScreenState extends State<TasbehScreen> {
           ),
           TextButton(
             onPressed: () async {
-              HapticFeedback.heavyImpact();
+              await _checkVibrationSetting();
+              if (vibrationEnabled) {
+                HapticFeedback.heavyImpact();
+              }
+
               setState(() {
                 counter = 0;
-                // Barcha zikr sanagichlarini 0 ga qaytarish
                 for (String dhikr in dhikrTypes) {
                   dhikrCounters[dhikr] = 0;
                 }
@@ -125,6 +151,13 @@ class _TasbehScreenState extends State<TasbehScreen> {
         ],
       ),
     );
+  }
+
+  // YANGI: Screen ga qaytganda sozlamalarni yangilash
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _checkVibrationSetting();
   }
 
   @override
@@ -185,13 +218,16 @@ class _TasbehScreenState extends State<TasbehScreen> {
                         ),
                       );
                     }).toList(),
-                    onChanged: (String? newValue) {
+                    onChanged: (String? newValue) async {
                       if (newValue != null) {
+                        await _checkVibrationSetting(); // YANGI
+                        if (vibrationEnabled) {
+                          HapticFeedback.selectionClick();
+                        }
                         setState(() {
                           selectedDhikr = newValue;
                         });
                         _saveCounters();
-                        HapticFeedback.selectionClick();
                       }
                     },
                   ),
@@ -221,10 +257,7 @@ class _TasbehScreenState extends State<TasbehScreen> {
                     ),
                     // Counter button
                     GestureDetector(
-                      onTap: () {
-                        HapticFeedback.selectionClick();
-                        _incrementCounter();
-                      },
+                      onTap: _incrementCounter,
                       child: Container(
                         width: 200,
                         height: 200,
