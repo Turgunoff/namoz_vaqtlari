@@ -13,7 +13,6 @@ class PrayerTimeService {
 
   static const String baseUrl = 'https://api.aladhan.com/v1/timings';
 
-  // O'zbekiston shaharlari
   static final List<City> cities = [
     City(name: 'Toshkent', latitude: 41.2995, longitude: 69.2401),
     City(name: 'Samarqand', latitude: 39.6270, longitude: 66.9750),
