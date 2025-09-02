@@ -13,6 +13,8 @@ void main() {
 }
 
 class NamozVaqtlariApp extends StatelessWidget {
+  const NamozVaqtlariApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
