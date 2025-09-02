@@ -543,7 +543,13 @@ class TasbehScreen extends StatefulWidget {
 
 class _TasbehScreenState extends State<TasbehScreen> {
   int counter = 0;
-  int totalCounter = 0;
+  Map<String, int> dhikrCounters = {
+    'SubhanAlloh': 0,
+    'Alhamdulillah': 0,
+    'Allohu Akbar': 0,
+    'La ilaha illalloh': 0,
+    'Istighfar': 0,
+  };
   bool isLoading = true;
 
   // Zikr turlari
@@ -566,8 +572,13 @@ class _TasbehScreenState extends State<TasbehScreen> {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       counter = prefs.getInt('tasbehCounter') ?? 0;
-      totalCounter = prefs.getInt('tasbehTotalCounter') ?? 0;
       selectedDhikr = prefs.getString('selectedDhikr') ?? 'SubhanAlloh';
+
+      // Har bir zikr uchun alohida sanagichlarni yuklash
+      for (String dhikr in dhikrTypes) {
+        dhikrCounters[dhikr] = prefs.getInt('dhikr_$dhikr') ?? 0;
+      }
+
       isLoading = false;
     });
   }
@@ -575,14 +586,18 @@ class _TasbehScreenState extends State<TasbehScreen> {
   Future<void> _saveCounters() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('tasbehCounter', counter);
-    await prefs.setInt('tasbehTotalCounter', totalCounter);
     await prefs.setString('selectedDhikr', selectedDhikr);
+
+    // Har bir zikr uchun alohida sanagichlarni saqlash
+    for (String dhikr in dhikrTypes) {
+      await prefs.setInt('dhikr_$dhikr', dhikrCounters[dhikr]!);
+    }
   }
 
   void _incrementCounter() async {
     setState(() {
       counter++;
-      totalCounter++;
+      dhikrCounters[selectedDhikr] = dhikrCounters[selectedDhikr]! + 1;
 
       if (counter == 33) {
         counter = 0;
@@ -628,7 +643,10 @@ class _TasbehScreenState extends State<TasbehScreen> {
               HapticFeedback.heavyImpact();
               setState(() {
                 counter = 0;
-                totalCounter = 0;
+                // Barcha zikr sanagichlarini 0 ga qaytarish
+                for (String dhikr in dhikrTypes) {
+                  dhikrCounters[dhikr] = 0;
+                }
               });
               await _saveCounters();
               Navigator.pop(context);
@@ -789,43 +807,99 @@ class _TasbehScreenState extends State<TasbehScreen> {
                   color: Colors.white30,
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                child: Column(
                   children: [
-                    Column(
+                    // Joriy zikr statistikasi
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        Text(
-                          'Jami zikrlar',
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
+                        Column(
+                          children: [
+                            Text(
+                              'Joriy zikr',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${dhikrCounters[selectedDhikr]}',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 5),
-                        Text(
-                          '$totalCounter',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                        Container(height: 50, width: 1, color: Colors.white30),
+                        Column(
+                          children: [
+                            Text(
+                              'Jami zikrlar',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.white70,
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text(
+                              '${dhikrCounters.values.fold(0, (sum, count) => sum + count)}',
+                              style: TextStyle(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                    Container(height: 50, width: 1, color: Colors.white30),
-                    Column(
-                      children: [
-                        Text(
-                          'To\'liq aylanish',
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          '${(totalCounter / 33).floor()}',
-                          style: TextStyle(
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
+                    SizedBox(height: 15),
+                    // Barcha zikrlar ro'yxati
+                    Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        children: dhikrTypes.map((dhikr) {
+                          return Padding(
+                            padding: EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  dhikr,
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: dhikr == selectedDhikr
+                                        ? Colors.white
+                                        : Colors.white70,
+                                    fontWeight: dhikr == selectedDhikr
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                                Text(
+                                  '${dhikrCounters[dhikr]}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: dhikr == selectedDhikr
+                                        ? Colors.white
+                                        : Colors.white70,
+                                    fontWeight: dhikr == selectedDhikr
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ],
                 ),
