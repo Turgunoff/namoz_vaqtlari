@@ -139,10 +139,6 @@ class _MainScreenState extends State<MainScreen> {
               child: Icon(Icons.wifi_off, color: Colors.white70),
             ),
           IconButton(icon: Icon(Icons.refresh), onPressed: _loadPrayerTimes),
-          IconButton(
-            icon: Icon(Icons.info_outline),
-            onPressed: () => _showAboutDialog(context),
-          ),
         ],
       ),
       body: Container(
@@ -226,66 +222,30 @@ class _MainScreenState extends State<MainScreen> {
                     ),
             ),
 
-            // Tasbeh tugmasi
-            Container(
-              margin: EdgeInsets.all(16),
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => TasbehScreen()),
-                  );
-                },
-                icon: Icon(Icons.fiber_smart_record),
-                label: Text('Tasbeh', style: TextStyle(fontSize: 18)),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: Colors.teal,
-                  padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                ),
-              ),
-            ),
+            // // Tasbeh tugmasi
+            // Container(
+            //   margin: EdgeInsets.all(16),
+            //   child: ElevatedButton.icon(
+            //     onPressed: () {
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => TasbehScreen()),
+            //       );
+            //     },
+            //     icon: Icon(Icons.fiber_smart_record),
+            //     label: Text('Tasbeh', style: TextStyle(fontSize: 18)),
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: Colors.white,
+            //       foregroundColor: Colors.teal,
+            //       padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(30),
+            //       ),
+            //     ),
+            //   ),
+            // ),
           ],
         ),
-      ),
-    );
-  }
-
-  void _showAboutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Ilova haqida'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Namoz Vaqtlari - Uzbekistan'),
-            SizedBox(height: 8),
-            Text('Versiya: 1.0.0'),
-            SizedBox(height: 8),
-            Text('© 2025 Afsona Makon MCHJ'),
-            SizedBox(height: 16),
-            Text(
-              'Ma\'lumotlar Aladhan.com API orqali\nolinadi yoki offline hisoblanadi.',
-              style: TextStyle(fontSize: 11, color: Colors.grey),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Aloqa:\nafsonamakonmchj@gmail.com',
-              style: TextStyle(fontSize: 12),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('OK'),
-          ),
-        ],
       ),
     );
   }

@@ -2,7 +2,7 @@
 // Copyright (c) 2025 Afsona Makon MCHJ. All rights reserved.
 
 import 'package:flutter/material.dart';
-import 'screens/main_screen.dart';
+import 'screens/main_navigation.dart';
 
 // Main App
 void main() {
@@ -18,7 +18,7 @@ class NamozVaqtlariApp extends StatelessWidget {
       title: 'Namoz Vaqtlari - Uzbekistan',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.teal, useMaterial3: false),
-      home: MainScreen(),
+      home: MainNavigation(),
     );
   }
 }
