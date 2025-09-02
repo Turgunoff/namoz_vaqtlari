@@ -6,11 +6,6 @@ import 'dart:convert';
 import '../models/prayer_models.dart';
 
 class PrayerTimeService {
-  // API Options:
-  // 1. Aladhan API - eng mashhur va bepul
-  // 2. Muslim Salat API
-  // 3. IslamicFinder API
-
   static const String baseUrl = 'https://api.aladhan.com/v1/timings';
 
   static final List<City> cities = [
